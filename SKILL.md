@@ -99,44 +99,101 @@ query: "Ilya Sutskever Safe Superintelligence news today"
 
 ## Step 2: Curate and analyze
 
-Read the briefing prompt from `references/briefing-prompt.md`.
+Using all collected data from Step 1, produce a structured technical briefing.
 
-Using all collected data from Step 1, apply the briefing prompt to produce a structured 7-section technical briefing.
-
-### Pre-processing rules
-
-Before applying the briefing prompt:
+### Pre-processing
 
 - **Dedup**: same story across multiple sources = one item, pick best source
-- **Lab blog auto-include**: posts from OpenAI, Anthropic, DeepMind, Google Research, Meta AI are **always included** in the relevant section — they are never filtered out
+- **Lab blog auto-include**: posts from OpenAI, Anthropic, DeepMind, Google Research, Meta AI are **always included** — never filtered out
 - **Strategy C noise reduction**: if WebSearch only returns old news (> 7 days), skip silently
 - **Source attribution**: every item must trace back to a specific account, blog, or URL
+- **Fact vs opinion**: distinguish 【事实】(what happened) from 【观点】(someone's judgment)
+- **No marketing**: ignore UI updates, promotional content, hype without substance
+- **Core judgment**: avoid simple restatement — extract the underlying technical insight
 
-### Section-to-source mapping
+### ① 今日速览（Top Signals）
 
-Guide for populating each section:
+Only the **5 most important** signals from the past 3 days:
+- 重大 AI 模型或产品发布
+- 技术路线变化
+- 重要行业判断
 
-| Section | Primary sources |
-|---------|----------------|
-| ① Top Signals | Lab blogs, HN top posts, high-engagement tweets from lab leaders |
-| ② Builder's Changelog | Lab blogs (OpenAI, Anthropic, DeepMind, Meta AI), LangChain blog, HN |
-| ③ Engineer/Researcher views | @_akhaliq, @DrJimFan, @ShunyuYao14, @Thom_Wolf, @karpathy, arXiv, Karpathy blog, Raschka blog |
-| ④ Founder/Entrepreneur views | @swyx, @yoheinakajima, @amjad, Lenny, Ethan Mollick, Stratechery |
-| ⑤ VC signals | @a16z, @sequoia, @benchmark, @foundersfund, @balajis, @deedydas |
-| ⑥ Architect Decision Lens | Synthesized from all sections above |
-| ⑦ One Pattern | Synthesized from all sections above |
+Each item includes:
+- 【事实】发生了什么
+- 【观点】发布者或行业的判断
+- 【工程含义】这对 AI 系统设计或工程实践意味着什么
 
-Sections with zero relevant items should be **omitted** (do not show empty sections).
+**Primary sources**: Lab blogs, HN top posts, high-engagement tweets from lab leaders
+
+### ② AI 公司与开发者发布（Builder's Changelog）
+
+Track:
+- 新模型、API 变化、推理性能变化、定价变化、新模态能力、开源模型或权重
+
+Ignore:
+- UI 更新、marketing
+
+Analysis focus: 这些发布对 **开发者生态或系统架构** 的实际影响。
+
+**Primary sources**: Lab blogs (OpenAI, Anthropic, DeepMind, Meta AI), LangChain blog, HN
+
+### ③ 工程师 / 研究者观点
+
+Topics: 新架构、agent 系统、reasoning 模型、evaluation 方法、长上下文处理、inference 优化
+
+Requirements: 提炼核心技术判断，不是简单转述。
+
+**Primary sources**: @_akhaliq, @DrJimFan, @ShunyuYao14, @Thom_Wolf, @karpathy, arXiv, Karpathy blog, Raschka blog
+
+### ④ 创业者 / 企业家观点
+
+Topics: AI agent、workflow automation、vertical AI、新应用模式
+
+Analysis focus: 这些判断反映了 **哪些新的产品机会或趋势**。
+
+**Primary sources**: @swyx, @yoheinakajima, @amjad, Lenny, Ethan Mollick, Stratechery
+
+### ⑤ VC / 投资信号
+
+Topics: AI 创业方向、投资热点、技术路径判断
+
+Analysis focus: 不要只记录融资新闻。分析投资叙事反映了市场对哪些技术路径的认可（agent 平台、vertical AI、infra 层、data 层）。
+
+**Primary sources**: @a16z, @sequoia, @benchmark, @foundersfund, @balajis, @deedydas
+
+### ⑥ Architect Decision Lens（架构决策视角）
+
+Synthesized from all sections above. Answer these 4 questions:
+
+1. 今天最值得 reconsider 的技术假设是什么？
+2. 哪个技术趋势可能在 6-12 个月内改变 production architecture？
+3. 哪个 hype 最可能被证明是 false signal？
+4. 如果设计新的 AI 系统，今天的最佳实践会发生什么变化？
+
+### ⑦ One Pattern to Remember
+
+Synthesized from all sections above. Extract one "AI Engineering Pattern" worth remembering.
+
+Format:
+- **Pattern**: [one-sentence pattern statement]
+- **解释**: 这个模式对未来 AI 系统设计意味着什么
+
+Example: *Reasoning models are shifting evaluation from accuracy → process supervision.*
+
+### Section rules
+
+- Sections with zero relevant items → **omit** (do not show empty headers)
+- Every item must have source attribution: `(@handle)`, `(OpenAI Blog)`, `(HN, 350pts)` etc.
 
 ## Step 3: Output to terminal
 
-Print the briefing following the structure defined in `references/briefing-prompt.md`.
+Print the briefing to the terminal.
 
 **Formatting rules:**
 
-- Language: 中文, keep English proper nouns (model names, company names, technical terms)
-- Bullet points, high information density
-- Every item has source attribution: `(@handle)`, `(OpenAI Blog)`, `(HN, 350pts)` etc.
+- 中文，keep English proper nouns (model names, company names, technical terms)
+- Bullet points，高信噪比，信息密度高
+- 避免冗长描述，语言像技术 briefing
 - No pomodoro estimates, no checkboxes — this is a briefing, not a task list
 
 ## Error handling
