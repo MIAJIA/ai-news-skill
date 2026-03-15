@@ -21,7 +21,6 @@
 | ID | Name | RSS URL | Category |
 |----|------|---------|----------|
 | openai | OpenAI Blog | https://openai.com/blog/rss.xml | ai |
-| anthropic | Anthropic Research | https://www.anthropic.com/feed | ai |
 | meta-ai | Meta AI Blog | https://ai.meta.com/blog/rss/ | ai |
 | karpathy | Andrej Karpathy | https://karpathy.bearblog.dev/feed/ | ai |
 | deepmind | DeepMind Blog | https://deepmind.google/blog/rss.xml | ai |
@@ -116,6 +115,8 @@ People/orgs without RSS or Twitter presence worth tracking separately.
 
 | Name | Tracking Method | Notes |
 |------|----------------|-------|
+| Anthropic Engineering | WebFetch "https://www.anthropic.com/engineering" | 无 RSS，直接抓 HTML 提取最近文章 |
+| Anthropic Research | WebFetch "https://www.anthropic.com/research" | 无 RSS，直接抓 HTML 提取最近文章 |
 | Ilya Sutskever / SSI | WebSearch "Ilya Sutskever Safe Superintelligence" | Rare but high-signal, supplements @ilyasut |
 
 ## Curation Rules

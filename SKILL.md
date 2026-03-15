@@ -19,17 +19,26 @@ Read all RSS URLs from `references/news-sources.md` (the "RSS Feeds" tables).
 
 Use `WebFetch` to fetch all feeds **in parallel**, batched up to 5 concurrent calls:
 
-- Batch 1: OpenAI, Anthropic, Meta AI, DeepMind, Google Research
+- Batch 1: OpenAI, Meta AI, DeepMind, Google Research
 - Batch 2: HN, Karpathy, Ethan Mollick, LangChain, arXiv cs.AI
 - Batch 3: Stratechery, Lenny, Paul Graham, Astral Codex Ten, Joel on Software
 - Batch 4: Sebastian Raschka, fast.ai, Distill.pub, Sam Altman, Dwarkesh Patel, Amjad Masad
 
 For each feed:
 
-- **Lab blogs** (OpenAI, Anthropic, Meta AI, DeepMind, Google Research): extract titles and dates from the last **7 days**
+- **Lab blogs** (OpenAI, Meta AI, DeepMind, Google Research): extract titles and dates from the last **7 days**
 - **All other feeds**: extract titles and dates from the last **3 days**
 - Do NOT fetch full article content (saves tokens)
 - If a feed fails, skip silently and continue
+
+**Anthropic (no RSS — WebFetch HTML pages)**
+
+Anthropic has no RSS feed. Use `WebFetch` to scrape these two pages **in parallel** (can run alongside RSS Batch 1):
+
+1. `https://www.anthropic.com/engineering` — extract article titles, dates, URLs from the last 7 days
+2. `https://www.anthropic.com/research` — extract article titles, dates, URLs from the last 7 days
+
+These are lab blog posts and follow the same auto-include rule as other lab blogs.
 
 ### Strategy B — Twitter/X (high-signal accounts)
 
