@@ -1,218 +1,218 @@
 ---
 name: news
-description: 高信噪比 AI 技术简报。从 RSS、Twitter/X、WebSearch 并行采集过去 3 天动态，结构化分析输出 7 section 技术 briefing（Top Signals、Builder's Changelog、研究者观点、创业者观点、VC 信号、架构决策视角、Pattern）。可独立使用或被 /today 调用。
+description: 高信噪比 AI 技术简报。从 RSS、Twitter/X、WebSearch 并行采集过去 3 天动态，结构化分析输出 7 个板块的技术简报（今日速览、开发者发布、研究者观点、创业者观点、VC 信号、架构决策视角、值得记住的模式）。可独立使用或被 /today 调用。
 ---
 
 # /news
 
-高信噪比 AI 技术简报。并行采集 → 结构化分析 → 终端输出 7 section 技术 briefing。
+高信噪比 AI 技术简报。并行采集 → 结构化分析 → 终端输出 7 个板块的技术简报。
 
-## Step 1: Fetch sources
+## 第一步：采集数据源
 
-Read source configuration from `references/news-sources.md` (relative to this skill's base directory).
+读取 `references/news-sources.md`（相对于本 skill 的根目录）中的源配置。
 
-Run **all three strategies in parallel**.
+**三条策略并行执行。**
 
-### Strategy A — RSS Feeds (primary, low-token)
+### 策略 A — RSS 订阅（主力，低 token 消耗）
 
-Read all RSS URLs from `references/news-sources.md` (the "RSS Feeds" tables).
+从 `references/news-sources.md` 的 "RSS Feeds" 表格中读取所有 RSS URL。
 
-Use `WebFetch` to fetch all feeds **in parallel**, batched up to 5 concurrent calls:
+用 `WebFetch` **并行**拉取所有 feed，每批最多 5 个：
 
-- Batch 1: OpenAI, Meta AI, DeepMind, Google Research
-- Batch 2: HN, Karpathy, Ethan Mollick, LangChain, arXiv cs.AI
-- Batch 3: Stratechery, Lenny, Paul Graham, Astral Codex Ten, Joel on Software
-- Batch 4: Sebastian Raschka, fast.ai, Distill.pub, Sam Altman, Dwarkesh Patel, Amjad Masad
+- 第 1 批：OpenAI、Meta AI、DeepMind、Google Research
+- 第 2 批：HN、Karpathy、Ethan Mollick、LangChain、arXiv cs.AI
+- 第 3 批：Stratechery、Lenny、Paul Graham、Astral Codex Ten、Joel on Software
+- 第 4 批：Sebastian Raschka、fast.ai、Distill.pub、Sam Altman、Dwarkesh Patel、Amjad Masad
 
-For each feed:
+每个 feed 的处理规则：
 
-- **Lab blogs** (OpenAI, Meta AI, DeepMind, Google Research): extract titles and dates from the last **7 days**
-- **All other feeds**: extract titles and dates from the last **3 days**
-- Do NOT fetch full article content (saves tokens)
-- If a feed fails, skip silently and continue
+- **实验室博客**（OpenAI、Meta AI、DeepMind、Google Research）：提取最近 **7 天**的标题和日期
+- **其他 feed**：提取最近 **3 天**的标题和日期
+- 不要拉取文章全文（节省 token）
+- 某个 feed 失败时，静默跳过，继续处理其他源
 
-**Anthropic (no RSS — WebFetch HTML pages)**
+**Anthropic（无 RSS — 直接抓取 HTML 页面）**
 
-Anthropic has no RSS feed. Use `WebFetch` to scrape these two pages **in parallel** (can run alongside RSS Batch 1):
+Anthropic 没有 RSS feed。用 `WebFetch` **并行**抓取以下两个页面（可与 RSS 第 1 批同时执行）：
 
-1. `https://www.anthropic.com/engineering` — extract article titles, dates, URLs from the last 7 days
-2. `https://www.anthropic.com/research` — extract article titles, dates, URLs from the last 7 days
+1. `https://www.anthropic.com/engineering` — 提取最近 7 天的文章标题、日期、URL
+2. `https://www.anthropic.com/research` — 提取最近 7 天的文章标题、日期、URL
 
-These are lab blog posts and follow the same auto-include rule as other lab blogs.
+这些属于实验室博客，遵循与其他实验室博客相同的自动收录规则。
 
-### Strategy B — Twitter/X (high-signal accounts)
+### 策略 B — Twitter/X（高信噪比账号）
 
-Fetch tweets from key accounts listed in `references/news-sources.md` (the "Twitter/X Accounts" tables).
+从 `references/news-sources.md` 的 "Twitter/X Accounts" 表格中获取要追踪的账号列表。
 
-**B1. Twitter MCP (preferred — higher signal)**
+**B1. Twitter MCP（首选 — 信号质量更高）**
 
-If `mcp__twitter__search_tweets` is available, use it as the primary Twitter source.
+如果 `mcp__twitter__search_tweets` 可用，优先使用它作为 Twitter 数据源。
 
-Run `mcp__twitter__search_tweets` calls (count: 20 each) **sequentially in two batches** to avoid rate limits:
+执行 `mcp__twitter__search_tweets` 调用（每次 count: 20），**分两批串行执行**以避免触发速率限制：
 
-**Batch 1** (run these two in parallel):
+**第 1 批**（这两个并行执行）：
 
-1. AI Lab Leaders:
+1. AI 实验室负责人：
 
 ```
 query: "from:sama OR from:DarioAmodei OR from:demishassabis OR from:gdb OR from:geoffreyhinton"
 ```
 
-2. AI Researchers + Engineers:
+2. AI 研究者与工程师：
 
 ```
 query: "from:_akhaliq OR from:DrJimFan OR from:polynoamial OR from:ShunyuYao14 OR from:Thom_Wolf"
 ```
 
-**Batch 2** (run after Batch 1 completes):
+**第 2 批**（等第 1 批完成后执行）：
 
-3. Builders + Anthropic:
+3. 构建者与 Anthropic：
 
 ```
 query: "from:claudeai OR from:alexalbert__ OR from:AmandaAskell OR from:swyx OR from:yoheinakajima OR from:deedydas"
 ```
 
-4. Visionaries + VCs:
+4. 远见者与 VC：
 
 ```
 query: "from:VitalikButerin OR from:balajis OR from:elonmusk OR from:a16z OR from:sequoia OR from:foundersfund"
 ```
 
-From the results, filter to tweets from the last 3 days only.
+从结果中只保留最近 3 天的推文。
 
-**Rate limit handling**: If a call returns a rate limit error, wait 2 seconds and retry once. If it fails again, skip that group and continue — partial Twitter data is better than none.
+**速率限制处理**：如果某次调用返回速率限制错误，等待 2 秒后重试一次。如果仍然失败，跳过该组继续执行 — 部分 Twitter 数据好过没有数据。
 
-**B2. WebSearch fallback**
+**B2. WebSearch 降级方案**
 
-If Twitter MCP is not available (tool not found or connection error), fall back to `WebSearch` with `site:x.com` queries using the same account groupings:
+如果 Twitter MCP 不可用（工具未找到或连接错误），降级为使用 `WebSearch` 的 `site:x.com` 查询，使用相同的账号分组：
 
 1. `"site:x.com (@sama OR @DarioAmodei OR @demishassabis OR @gdb OR @geoffreyhinton) today"`
 2. `"site:x.com (@_akhaliq OR @DrJimFan OR @polynoamial OR @ShunyuYao14 OR @Thom_Wolf) today"`
 3. `"site:x.com (@claudeai OR @alexalbert__ OR @AmandaAskell OR @swyx OR @yoheinakajima OR @deedydas) today"`
 4. `"site:x.com (@VitalikButerin OR @balajis OR @elonmusk OR @a16z OR @sequoia OR @foundersfund) today"`
 
-**Filtering rules (both B1 and B2):**
+**过滤规则（B1 和 B2 通用）：**
 
-- Only keep tweets with **substance** (insights, announcements, paper links) — skip replies, memes, quote dunks
-- People who already have RSS (Karpathy, Raschka, Howard, etc.) are covered by Strategy A; only include their tweets if they share something **not on their blog**
+- 只保留有**实质内容**的推文（洞察、公告、论文链接）— 跳过回复、meme、抬杠
+- 已有 RSS 的人（Karpathy、Raschka、Howard 等）由策略 A 覆盖；仅当他们在 Twitter 上分享了**博客中没有的内容**时才收录
 
-### Strategy C — WebSearch (non-RSS, non-Twitter supplement)
+### 策略 C — WebSearch（无 RSS、无 Twitter 的补充源）
 
-Run **one** `WebSearch` call for sources without RSS or active Twitter:
+对没有 RSS 也没有活跃 Twitter 的源，执行**一次** `WebSearch` 调用：
 
 ```
 query: "Ilya Sutskever Safe Superintelligence news today"
 ```
 
-- Extract: **title**, **source**, **URL**
+- 提取：**标题**、**来源**、**URL**
 
-## Step 2: Curate and analyze
+## 第二步：筛选与分析
 
-Using all collected data from Step 1, produce a structured technical briefing.
+使用第一步采集的所有数据，生成结构化技术简报。
 
-### Pre-processing
+### 预处理规则
 
-- **Dedup**: same story across multiple sources = one item, pick best source
-- **Lab blog auto-include**: posts from OpenAI, Anthropic, DeepMind, Google Research, Meta AI are **always included** — never filtered out
-- **Strategy C noise reduction**: if WebSearch only returns old news (> 7 days), skip silently
-- **Source attribution**: every item must trace back to a specific account, blog, or URL
-- **Fact vs opinion**: distinguish 【事实】(what happened) from 【观点】(someone's judgment)
-- **No marketing**: ignore UI updates, promotional content, hype without substance
-- **Core judgment**: avoid simple restatement — extract the underlying technical insight
+- **去重**：同一条新闻出现在多个源中 = 合并为一条，选最佳来源
+- **实验室博客自动收录**：来自 OpenAI、Anthropic、DeepMind、Google Research、Meta AI 的文章**必须收录** — 永远不会被过滤掉
+- **策略 C 降噪**：如果 WebSearch 只返回旧闻（> 7 天），静默跳过
+- **来源标注**：每条信息必须追溯到具体的账号、博客或 URL
+- **区分事实与观点**：区分【事实】（发生了什么）和【观点】（某人的判断）
+- **过滤营销内容**：忽略 UI 更新、推广内容、无实质的炒作
+- **提炼核心判断**：避免简单转述 — 提取底层的技术洞察
 
-### ① 今日速览（Top Signals）
+### ① 今日速览
 
-Only the **5 most important** signals from the past 3 days:
+过去 3 天中**最重要的 5 条**动态：
 - 重大 AI 模型或产品发布
 - 技术路线变化
 - 重要行业判断
 
-Each item includes:
+每条包含：
 - 【事实】发生了什么
 - 【观点】发布者或行业的判断
 - 【工程含义】这对 AI 系统设计或工程实践意味着什么
 
-**Primary sources**: Lab blogs, HN top posts, high-engagement tweets from lab leaders
+**主要数据源**：实验室博客、HN 高分帖、实验室负责人的高互动推文
 
-### ② AI 公司与开发者发布（Builder's Changelog）
+### ② AI 公司与开发者发布
 
-Track:
+追踪内容：
 - 新模型、API 变化、推理性能变化、定价变化、新模态能力、开源模型或权重
 
-Ignore:
-- UI 更新、marketing
+忽略内容：
+- UI 更新、营销内容
 
-Analysis focus: 这些发布对 **开发者生态或系统架构** 的实际影响。
+分析重点：这些发布对**开发者生态或系统架构**的实际影响。
 
-**Primary sources**: Lab blogs (OpenAI, Anthropic, DeepMind, Meta AI), LangChain blog, HN
+**主要数据源**：实验室博客（OpenAI、Anthropic、DeepMind、Meta AI）、LangChain 博客、HN
 
 ### ③ 工程师 / 研究者观点
 
-Topics: 新架构、agent 系统、reasoning 模型、evaluation 方法、长上下文处理、inference 优化
+关注话题：新架构、agent 系统、推理模型、评估方法、长上下文处理、推理优化
 
-Requirements: 提炼核心技术判断，不是简单转述。
+要求：提炼核心技术判断，不是简单转述。
 
-**Primary sources**: @_akhaliq, @DrJimFan, @ShunyuYao14, @Thom_Wolf, @karpathy, arXiv, Karpathy blog, Raschka blog
+**主要数据源**：@_akhaliq、@DrJimFan、@ShunyuYao14、@Thom_Wolf、@karpathy、arXiv、Karpathy 博客、Raschka 博客
 
 ### ④ 创业者 / 企业家观点
 
-Topics: AI agent、workflow automation、vertical AI、新应用模式
+关注话题：AI agent、工作流自动化、垂直 AI、新应用模式
 
-Analysis focus: 这些判断反映了 **哪些新的产品机会或趋势**。
+分析重点：这些判断反映了**哪些新的产品机会或趋势**。
 
-**Primary sources**: @swyx, @yoheinakajima, @amjad, Lenny, Ethan Mollick, Stratechery
+**主要数据源**：@swyx、@yoheinakajima、@amjad、Lenny、Ethan Mollick、Stratechery
 
 ### ⑤ VC / 投资信号
 
-Topics: AI 创业方向、投资热点、技术路径判断
+关注话题：AI 创业方向、投资热点、技术路径判断
 
-Analysis focus: 不要只记录融资新闻。分析投资叙事反映了市场对哪些技术路径的认可（agent 平台、vertical AI、infra 层、data 层）。
+分析重点：不要只记录融资新闻。分析投资叙事反映了市场对哪些技术路径的认可（agent 平台、垂直 AI、基础设施层、数据层）。
 
-**Primary sources**: @a16z, @sequoia, @benchmark, @foundersfund, @balajis, @deedydas
+**主要数据源**：@a16z、@sequoia、@benchmark、@foundersfund、@balajis、@deedydas
 
-### ⑥ Architect Decision Lens（架构决策视角）
+### ⑥ 架构决策视角
 
-Synthesized from all sections above. Answer these 4 questions:
+综合以上所有板块，回答以下 4 个问题：
 
-1. 今天最值得 reconsider 的技术假设是什么？
-2. 哪个技术趋势可能在 6-12 个月内改变 production architecture？
-3. 哪个 hype 最可能被证明是 false signal？
-4. 如果设计新的 AI 系统，今天的最佳实践会发生什么变化？
+1. 今天最值得重新审视的技术假设是什么？
+2. 哪个技术趋势可能在 6-12 个月内改变生产架构？
+3. 哪个热点最可能被证明是虚假信号？
+4. 如果今天设计新的 AI 系统，最佳实践会发生什么变化？
 
-### ⑦ One Pattern to Remember
+### ⑦ 值得记住的模式
 
-Synthesized from all sections above. Extract one "AI Engineering Pattern" worth remembering.
+综合以上所有板块，提炼一个最值得记住的 "AI 工程模式"。
 
-Format:
-- **Pattern**: [one-sentence pattern statement]
-- **解释**: 这个模式对未来 AI 系统设计意味着什么
+格式：
+- **模式**：[一句话模式描述]
+- **解释**：这个模式对未来 AI 系统设计意味着什么
 
-Example: *Reasoning models are shifting evaluation from accuracy → process supervision.*
+示例：*推理模型正在将评估标准从准确率转向过程监督。*
 
-### Section rules
+### 板块规则
 
-- Sections with zero relevant items → **omit** (do not show empty headers)
-- Every item must have source attribution: `(@handle)`, `(OpenAI Blog)`, `(HN, 350pts)` etc.
+- 没有相关内容的板块 → **省略**（不显示空标题）
+- 每条信息必须标注来源：`(@handle)`、`(OpenAI 博客)`、`(HN, 350分)` 等
 
-## Step 3: Output to terminal
+## 第三步：终端输出
 
-Print the briefing to the terminal.
+将简报打印到终端。
 
-**Formatting rules:**
+**格式要求：**
 
-- 中文，keep English proper nouns (model names, company names, technical terms)
-- Bullet points，高信噪比，信息密度高
-- 避免冗长描述，语言像技术 briefing
-- No pomodoro estimates, no checkboxes — this is a briefing, not a task list
+- 中文，保留英文专有名词（模型名、公司名、技术术语）
+- 要点式排版，高信噪比，高信息密度
+- 避免冗长描述，语言风格像技术简报
+- 不要番茄钟估时，不要复选框 — 这是简报，不是任务清单
 
-## Error handling
+## 错误处理
 
-- If any single source fails (WebFetch timeout, WebSearch error, Twitter rate limit), log briefly and continue with remaining sources.
-- If ALL sources fail, print: `⚠️ 所有新闻源获取失败，请检查网络连接。`
+- 如果单个数据源失败（WebFetch 超时、WebSearch 错误、Twitter 速率限制），简要记录后继续处理其他源。
+- 如果所有数据源都失败，打印：`⚠️ 所有新闻源获取失败，请检查网络连接。`
 
-## Caller integration
+## 调用方集成
 
-When invoked by another skill (e.g. `/today`), the caller should:
+当被其他 skill（如 `/today`）调用时，调用方应：
 
-1. Invoke this skill to collect and produce the full briefing
-2. Embed the complete output into the `📰 今日资讯` section of the plan
+1. 调用本 skill 采集并生成完整简报
+2. 将完整输出嵌入到计划的 `📰 今日资讯` 板块中
