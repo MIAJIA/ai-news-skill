@@ -19,10 +19,10 @@ Read all RSS URLs from `references/news-sources.md` (the "RSS Feeds" tables).
 
 Use `WebFetch` to fetch all feeds **in parallel**, batched up to 5 concurrent calls:
 
-- Batch 1: HN, Karpathy, DeepMind, Google Research, Ethan Mollick
-- Batch 2: LangChain, Stratechery, Lenny, Paul Graham, Astral Codex Ten
-- Batch 3: Joel on Software, Sebastian Raschka, fast.ai, Distill.pub, arXiv cs.AI
-- Batch 4: Sam Altman, Dwarkesh Patel, Amjad Masad
+- Batch 1: OpenAI, Anthropic, Meta AI, DeepMind, Google Research
+- Batch 2: HN, Karpathy, Ethan Mollick, LangChain, arXiv cs.AI
+- Batch 3: Stratechery, Lenny, Paul Graham, Astral Codex Ten, Joel on Software
+- Batch 4: Sebastian Raschka, fast.ai, Distill.pub, Sam Altman, Dwarkesh Patel, Amjad Masad
 
 For each feed:
 

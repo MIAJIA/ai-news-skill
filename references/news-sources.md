@@ -20,6 +20,9 @@
 
 | ID | Name | RSS URL | Category |
 |----|------|---------|----------|
+| openai | OpenAI Blog | https://openai.com/blog/rss.xml | ai |
+| anthropic | Anthropic Research | https://www.anthropic.com/feed | ai |
+| meta-ai | Meta AI Blog | https://ai.meta.com/blog/rss/ | ai |
 | karpathy | Andrej Karpathy | https://karpathy.bearblog.dev/feed/ | ai |
 | deepmind | DeepMind Blog | https://deepmind.google/blog/rss.xml | ai |
 | google-research | Google Research | https://research.google/blog/rss.xml | ai |
