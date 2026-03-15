@@ -26,7 +26,8 @@ Use `WebFetch` to fetch all feeds **in parallel**, batched up to 5 concurrent ca
 
 For each feed:
 
-- Extract **titles and dates only** from the last 48 hours
+- **Lab blogs** (OpenAI, Anthropic, Meta AI, DeepMind, Google Research): extract titles and dates from the last **7 days**
+- **All other feeds**: extract titles and dates from the last **48 hours**
 - Do NOT fetch full article content (saves tokens)
 - If a feed fails, skip silently and continue
 
@@ -107,13 +108,26 @@ From combined results (Strategy A + B + C), use AI judgment to select the **top 
 3. Deep thinking pieces (strategy, industry analysis)
 4. Developer tools & DevEx
 
-### Selection rules
+### Lab blog auto-include rule
 
-- **Daily quota**: 3-5 items total, never more
+Posts from major AI lab official blogs are **auto-included** and do not compete with HN or Twitter for quota:
+
+- **Auto-include sources**: OpenAI, Anthropic, DeepMind, Google Research, Meta AI
+- **Recency window**: 7 days (these blogs post infrequently; a 48h window misses most posts)
+- If a lab blog has a new post within 7 days, it is **always shown** — even if the daily quota is already full
+- These items appear at the **top** of the 📰 section, before other curated items
+
+### Selection rules (for all other sources)
+
+- **Daily quota**: 3-5 items total (excluding auto-included lab blog posts), never more
 - **Dedup**: same story across multiple sources = one item, pick best source
 - **Recency**: prefer last 24h, allow up to 48h for low-frequency blogs
 - **arXiv**: only surface papers with unusually high engagement or from well-known labs
 - **HN**: favor posts with high points-to-time ratio (trending)
+
+### Strategy C noise reduction
+
+- If WebSearch (Strategy C) only returns old news (> 7 days) for a source, **skip silently** — do not include stale results just to fill space
 
 ### Output format per item
 
