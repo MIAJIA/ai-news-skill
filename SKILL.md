@@ -38,7 +38,9 @@ Fetch tweets from key accounts listed in `references/news-sources.md` (the "Twit
 
 If `mcp__twitter__search_tweets` is available, use it as the primary Twitter source.
 
-Run **four** parallel `mcp__twitter__search_tweets` calls (count: 20 each):
+Run `mcp__twitter__search_tweets` calls (count: 20 each) **sequentially in two batches** to avoid rate limits:
+
+**Batch 1** (run these two in parallel):
 
 1. AI Lab Leaders:
 
@@ -51,6 +53,8 @@ query: "from:sama OR from:DarioAmodei OR from:demishassabis OR from:gdb OR from:
 ```
 query: "from:_akhaliq OR from:DrJimFan OR from:polynoamial OR from:ShunyuYao14 OR from:Thom_Wolf"
 ```
+
+**Batch 2** (run after Batch 1 completes):
 
 3. Builders + Anthropic:
 
@@ -65,6 +69,8 @@ query: "from:VitalikButerin OR from:balajis OR from:elonmusk OR from:a16z OR fro
 ```
 
 From the results, filter to tweets from the last 48 hours only.
+
+**Rate limit handling**: If a call returns a rate limit error, wait 2 seconds and retry once. If it fails again, skip that group and continue — partial Twitter data is better than none.
 
 **B2. WebSearch fallback**
 
