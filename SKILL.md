@@ -30,23 +30,52 @@ For each feed:
 - Do NOT fetch full article content (saves tokens)
 - If a feed fails, skip silently and continue
 
-### Strategy B — Twitter/X via WebSearch (high-signal accounts)
+### Strategy B — Twitter/X (high-signal accounts)
 
-Twitter has no public RSS. Use `WebSearch` to catch viral/high-engagement tweets from key accounts listed in `references/news-sources.md` (the "Twitter/X Accounts" tables).
+Fetch tweets from key accounts listed in `references/news-sources.md` (the "Twitter/X Accounts" tables).
 
-Run **two** parallel `WebSearch` calls:
+**B1. Twitter MCP (preferred — higher signal)**
 
-1. Scientists + Engineers:
+If `mcp__twitter__search_tweets` is available, use it as the primary Twitter source.
 
-```
-query: "site:x.com (@_akhaliq OR @DrJimFan OR @polynoamial OR @karpathy_out OR @yoheinakajima) today"
-```
+Run **four** parallel `mcp__twitter__search_tweets` calls (count: 20 each):
 
-2. Builders + Visionaries:
+1. AI Lab Leaders:
 
 ```
-query: "site:x.com (@VitalikButerin OR @balajis OR @linus_lee) today"
+query: "from:sama OR from:DarioAmodei OR from:demishassabis OR from:gdb OR from:geoffreyhinton"
 ```
+
+2. AI Researchers + Engineers:
+
+```
+query: "from:_akhaliq OR from:DrJimFan OR from:polynoamial OR from:ShunyuYao14 OR from:Thom_Wolf"
+```
+
+3. Builders + Anthropic:
+
+```
+query: "from:claudeai OR from:alexalbert__ OR from:AmandaAskell OR from:swyx OR from:yoheinakajima OR from:deedydas"
+```
+
+4. Visionaries + VCs:
+
+```
+query: "from:VitalikButerin OR from:balajis OR from:elonmusk OR from:a16z OR from:sequoia OR from:foundersfund"
+```
+
+From the results, filter to tweets from the last 48 hours only.
+
+**B2. WebSearch fallback**
+
+If Twitter MCP is not available (tool not found or connection error), fall back to `WebSearch` with `site:x.com` queries using the same account groupings:
+
+1. `"site:x.com (@sama OR @DarioAmodei OR @demishassabis OR @gdb OR @geoffreyhinton) today"`
+2. `"site:x.com (@_akhaliq OR @DrJimFan OR @polynoamial OR @ShunyuYao14 OR @Thom_Wolf) today"`
+3. `"site:x.com (@claudeai OR @alexalbert__ OR @AmandaAskell OR @swyx OR @yoheinakajima OR @deedydas) today"`
+4. `"site:x.com (@VitalikButerin OR @balajis OR @elonmusk OR @a16z OR @sequoia OR @foundersfund) today"`
+
+**Filtering rules (both B1 and B2):**
 
 - Only keep tweets with **substance** (insights, announcements, paper links) — skip replies, memes, quote dunks
 - People who already have RSS (Karpathy, Raschka, Howard, etc.) are covered by Strategy A; only include their tweets if they share something **not on their blog**

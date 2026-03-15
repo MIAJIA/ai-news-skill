@@ -50,6 +50,13 @@ Twitter 无公开 RSS，通过 WebSearch 抓取近期高互动推文。
 | @_akhaliq | AK | ai | 人类版 arXiv RSS，论文速报第一手 |
 | @polynoamial | Noam Brown | ai | OpenAI，强化学习/Search/Reasoning |
 | @DrJimFan | Jim Fan | ai | NVIDIA，Foundation Agents/具身智能 |
+| @sama | Sam Altman | ai | OpenAI CEO，也有 RSS |
+| @gdb | Greg Brockman | ai | OpenAI co-founder |
+| @demishassabis | Demis Hassabis | ai | DeepMind CEO，Nobel Prize |
+| @DarioAmodei | Dario Amodei | ai | Anthropic CEO |
+| @geoffreyhinton | Geoffrey Hinton | ai | Godfather of Deep Learning，Nobel Prize |
+| @Thom_Wolf | Thomas Wolf | ai | Hugging Face co-founder/CSO |
+| @ShunyuYao14 | Shunyu Yao | ai | Princeton，Tree of Thoughts/ReAct 作者 |
 
 ### 🛠️ 产品力与 AI 原生设计 (The Builders)
 
@@ -60,6 +67,14 @@ Twitter 无公开 RSS，通过 WebSearch 抓取近期高互动推文。
 | @amjad | Amjad Masad | ai | Replit CEO，也有 RSS |
 | @lennysan | Lenny Rachitsky | product | 产品增长方法论，也有 RSS |
 | @yoheinakajima | Yohei Nakajima | ai | BabyAGI 作者，Autonomous Agents 前沿 |
+| @claudeai | Claude | ai | Anthropic 官方账号 |
+| @alexalbert__ | Alex Albert | ai | Anthropic，Claude relations lead |
+| @AmandaAskell | Amanda Askell | ai | Anthropic，alignment/character research |
+| @deedydas | Deedy Das | ai | Menlo Ventures，ex-Google，AI 投资视角 |
+| @swyx | Shawn Wang (swyx) | ai | smol.ai，AI Engineer 社区 |
+| @alex_prompter | Alex Prompter | ai | Prompt engineering 实践 |
+| @Heyshrutimishra | Shruti Mishra | ai | AI 产品/内容 |
+| @bcherny | Boris Cherny | ai | 工程实践，TypeScript/AI |
 
 ### ⚙️ 工程架构与 Agent Infra (The Engineers)
 
@@ -78,6 +93,19 @@ Twitter 无公开 RSS，通过 WebSearch 抓取近期高互动推文。
 | @VitalikButerin | Vitalik Buterin | thinking | 去中心化治理/复杂系统，超越 Web3 |
 | @balajis | Balaji Srinivasan | thinking | 宏观技术预言，第一性原理 |
 | @linus_lee | Linus Lee | product | Notion AI，AI UI/UX 设计灵感 |
+| @peterthiel | Peter Thiel | thinking | Founders Fund，逆向思考 |
+| @elonmusk | Elon Musk | thinking | Tesla/xAI/SpaceX，高噪但偶有重大信号 |
+| @SawyerMerritt | Sawyer Merritt | tech | 科技/Elon 生态新闻速报 |
+| @Mayhem4Markets | Mayhem4Markets | thinking | 金融/市场/宏观趋势 |
+
+### 💰 VC 与投资机构 (The VCs)
+
+| Handle | Name | Category | Notes |
+|--------|------|----------|-------|
+| @a16z | Andreessen Horowitz | vc | a16z 官方，AI/crypto/bio 投资动态 |
+| @sequoia | Sequoia Capital | vc | 投资趋势，创业方法论 |
+| @benchmark | Benchmark | vc | 早期投资，产品驱动型 VC |
+| @foundersfund | Founders Fund | vc | Thiel 系，深科技/frontier 投资 |
 
 ## Non-RSS Sources (WebSearch fallback)
 
