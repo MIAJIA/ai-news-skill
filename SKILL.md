@@ -1,11 +1,11 @@
 ---
 name: news
-description: 个性化 AI/科技/产品新闻简报。从 RSS、Twitter/X、WebSearch 三条策略并行采集，AI 筛选 3-5 条最相关资讯，终端输出。可独立使用或被 /today 调用。
+description: 高信噪比 AI 技术简报。从 RSS、Twitter/X、WebSearch 并行采集过去 3 天动态，结构化分析输出 7 section 技术 briefing（Top Signals、Builder's Changelog、研究者观点、创业者观点、VC 信号、架构决策视角、Pattern）。可独立使用或被 /today 调用。
 ---
 
 # /news
 
-个性化新闻简报。并行采集 → AI 筛选 → 终端输出 3-5 条最相关资讯。
+高信噪比 AI 技术简报。并行采集 → 结构化分析 → 终端输出 7 section 技术 briefing。
 
 ## Step 1: Fetch sources
 
@@ -27,7 +27,7 @@ Use `WebFetch` to fetch all feeds **in parallel**, batched up to 5 concurrent ca
 For each feed:
 
 - **Lab blogs** (OpenAI, Anthropic, Meta AI, DeepMind, Google Research): extract titles and dates from the last **7 days**
-- **All other feeds**: extract titles and dates from the last **48 hours**
+- **All other feeds**: extract titles and dates from the last **3 days**
 - Do NOT fetch full article content (saves tokens)
 - If a feed fails, skip silently and continue
 
@@ -69,7 +69,7 @@ query: "from:claudeai OR from:alexalbert__ OR from:AmandaAskell OR from:swyx OR 
 query: "from:VitalikButerin OR from:balajis OR from:elonmusk OR from:a16z OR from:sequoia OR from:foundersfund"
 ```
 
-From the results, filter to tweets from the last 48 hours only.
+From the results, filter to tweets from the last 3 days only.
 
 **Rate limit handling**: If a call returns a rate limit error, wait 2 seconds and retry once. If it fails again, skip that group and continue — partial Twitter data is better than none.
 
@@ -97,68 +97,56 @@ query: "Ilya Sutskever Safe Superintelligence news today"
 
 - Extract: **title**, **source**, **URL**
 
-## Step 2: Curate
+## Step 2: Curate and analyze
 
-From combined results (Strategy A + B + C), use AI judgment to select the **top 3-5 items** most relevant to the user.
+Read the briefing prompt from `references/briefing-prompt.md`.
 
-### Priority order
+Using all collected data from Step 1, apply the briefing prompt to produce a structured 7-section technical briefing.
 
-1. AI / LLM breakthroughs (new models, major research, tool releases)
-2. Product & startup news (launches, pivots, funding)
-3. Deep thinking pieces (strategy, industry analysis)
-4. Developer tools & DevEx
+### Pre-processing rules
 
-### Lab blog auto-include rule
+Before applying the briefing prompt:
 
-Posts from major AI lab official blogs are **auto-included** and do not compete with HN or Twitter for quota:
-
-- **Auto-include sources**: OpenAI, Anthropic, DeepMind, Google Research, Meta AI
-- **Recency window**: 7 days (these blogs post infrequently; a 48h window misses most posts)
-- If a lab blog has a new post within 7 days, it is **always shown** — even if the daily quota is already full
-- These items appear at the **top** of the 📰 section, before other curated items
-
-### Selection rules (for all other sources)
-
-- **Daily quota**: 3-5 items total (excluding auto-included lab blog posts), never more
 - **Dedup**: same story across multiple sources = one item, pick best source
-- **Recency**: prefer last 24h, allow up to 48h for low-frequency blogs
-- **arXiv**: only surface papers with unusually high engagement or from well-known labs
-- **HN**: favor posts with high points-to-time ratio (trending)
+- **Lab blog auto-include**: posts from OpenAI, Anthropic, DeepMind, Google Research, Meta AI are **always included** in the relevant section — they are never filtered out
+- **Strategy C noise reduction**: if WebSearch only returns old news (> 7 days), skip silently
+- **Source attribution**: every item must trace back to a specific account, blog, or URL
 
-### Strategy C noise reduction
+### Section-to-source mapping
 
-- If WebSearch (Strategy C) only returns old news (> 7 days) for a source, **skip silently** — do not include stale results just to fill space
+Guide for populating each section:
 
-### Output format per item
+| Section | Primary sources |
+|---------|----------------|
+| ① Top Signals | Lab blogs, HN top posts, high-engagement tweets from lab leaders |
+| ② Builder's Changelog | Lab blogs (OpenAI, Anthropic, DeepMind, Meta AI), LangChain blog, HN |
+| ③ Engineer/Researcher views | @_akhaliq, @DrJimFan, @ShunyuYao14, @Thom_Wolf, @karpathy, arXiv, Karpathy blog, Raschka blog |
+| ④ Founder/Entrepreneur views | @swyx, @yoheinakajima, @amjad, Lenny, Ethan Mollick, Stratechery |
+| ⑤ VC signals | @a16z, @sequoia, @benchmark, @foundersfund, @balajis, @deedydas |
+| ⑥ Architect Decision Lens | Synthesized from all sections above |
+| ⑦ One Pattern | Synthesized from all sections above |
 
-For each selected item, generate:
-
-- **标题**: Chinese translation of the headline (keep proper nouns in English)
-- **一句话摘要**: one-sentence Chinese summary of why it matters
-- **source**: origin (HN / Karpathy / DeepMind / etc.)
-- **link**: original URL
+Sections with zero relevant items should be **omitted** (do not show empty sections).
 
 ## Step 3: Output to terminal
 
-Print the curated news to the terminal:
+Print the briefing following the structure defined in `references/briefing-prompt.md`.
 
-```
-📰 今日资讯
-━━━━━━━━━━
-  • {{标题}} — {{一句话摘要}} ({{source}})
-    {{link}}
-```
+**Formatting rules:**
 
-This section is **informational only** — no pomodoro estimate, no checkbox.
+- Language: 中文, keep English proper nouns (model names, company names, technical terms)
+- Bullet points, high information density
+- Every item has source attribution: `(@handle)`, `(OpenAI Blog)`, `(HN, 350pts)` etc.
+- No pomodoro estimates, no checkboxes — this is a briefing, not a task list
 
 ## Error handling
 
-- If any single source fails (WebFetch timeout, WebSearch error), log briefly and continue with remaining sources.
+- If any single source fails (WebFetch timeout, WebSearch error, Twitter rate limit), log briefly and continue with remaining sources.
 - If ALL sources fail, print: `⚠️ 所有新闻源获取失败，请检查网络连接。`
 
 ## Caller integration
 
 When invoked by another skill (e.g. `/today`), the caller should:
 
-1. Invoke this skill to collect and curate news
-2. Take the `📰 今日资讯` output and embed it into their own output format
+1. Invoke this skill to collect and produce the full briefing
+2. Embed the complete output into the `📰 今日资讯` section of the plan
