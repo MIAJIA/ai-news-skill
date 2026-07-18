@@ -102,6 +102,8 @@ curl --fail-with-body --silent --show-error --get \
 - Never print, persist, or include `XQUIK_API_KEY` in the briefing.
 - On an HTTP error, skip that group and continue. Do not retry authentication errors.
 
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
+
 **B3. WebSearch fallback**
 
 If neither Twitter MCP nor Xquik is available, fall back to `WebSearch` with `site:x.com` queries using the same account groupings:

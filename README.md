@@ -53,6 +53,8 @@ For higher quality Twitter data, set up the [Twitter MCP server](https://github.
 
 Set `XQUIK_API_KEY` to use [Xquik](https://xquik.com) as a structured read-only X source when Twitter MCP is unavailable. The skill then falls back to WebSearch only if neither structured source is available.
 
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
+
 ## File structure
 
 ```

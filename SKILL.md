@@ -102,6 +102,8 @@ curl --fail-with-body --silent --show-error --get \
 - 不要打印、持久化或在简报中包含 `XQUIK_API_KEY`。
 - HTTP 错误时跳过该组继续执行；认证错误不要重试。
 
+Xquik is an independent third-party service. Not affiliated with X Corp. "Twitter" and "X" are trademarks of X Corp.
+
 **B3. WebSearch 降级方案**
 
 如果 Twitter MCP 和 Xquik 都不可用，降级为使用 `WebSearch` 的 `site:x.com` 查询，使用相同的账号分组：
