@@ -30,6 +30,7 @@
 | raschka | Sebastian Raschka | https://sebastianraschka.com/rss.xml | ai |
 | fastai | fast.ai (Jeremy Howard) | https://www.fast.ai/index.xml | ai |
 | distill | Distill.pub | https://distill.pub/rss.xml | ai |
+| aihot | AIHOT 日报 (Chinese AI news digest) | https://aihot.news/feed/daily.xml | ai |
 
 ### 🧠 关键人物
 
